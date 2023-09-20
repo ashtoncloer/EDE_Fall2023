@@ -5,7 +5,7 @@ date: "Fall 2023"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ## OVERVIEW
@@ -33,12 +33,12 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 1.  Check your working directory, load necessary packages (tidyverse, lubridate), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
 
 ```{r setup,  message = FALSE}
-library(tidyverse)
+library(tidyverse) #loading neccesary packages
 library(lubridate)
 library(here)
 library(ggplot2)
 
-getwd()
+getwd() #setting working directory 
 here()
 
 Neonics.df <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", stringsAsFactors = TRUE)
@@ -66,7 +66,7 @@ Litter.df <- read.csv("./Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv", st
 
 5.  What are the dimensions of the dataset?
 
-```{r}
+```{r, dimensions}
 dim(Neonics.df)
 ```
 
@@ -74,7 +74,7 @@ dim(Neonics.df)
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
-```{r}
+```{r, summary}
 summary(Neonics.df$Effect)
 ```
 
@@ -83,17 +83,17 @@ summary(Neonics.df$Effect)
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.[TIP: The `sort()` command can sort the output of the summary command...]
 
-```{r}
+```{r, most common species}
 most_common <- summary(Neonics.df$Species.Common.Name)
 
-sort(most_common)
-```
+sort(most_common) #sorting the summary output
+``` 
 
 > Answer: The honey Bee, parasitic wasp, buff-tailed bumblebee, carniolan honey bee, bumble bee, and italian honeybee are the most commonly studied species, despite a category that reference 'other' species and totals 670 observations. The 5 bee species listed above are all pollinators and are important for humans and ecosystems alike. Studying the impact of neonicotinoid on pollinators is important for ensuring continued cross-pollination and subsequent growth of various plants used in agriculture. The parasitic wasp is also important for agriculture as they are natural methods for controlling other pests that often eat/ruin crops.
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric?
 
-```{r}
+```{r, determining class}
 class(Neonics.df$Conc.1..Author.)
 ```
 
@@ -103,14 +103,14 @@ class(Neonics.df$Conc.1..Author.)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
-```{r}
+```{r, frequency plot of studies by year}
 ggplot(Neonics.df) +
-  geom_freqpoly(aes(x = Publication.Year), bins=50)
+  geom_freqpoly(aes(x = Publication.Year), bins=50) #setting x-axis and bins
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
-```{r}
+```{r, same plot as above but by location}
 ggplot(Neonics.df) +
   geom_freqpoly(aes(x = Publication.Year, color = Test.Location), bins=50)
 ```
@@ -123,10 +123,10 @@ Interpret this graph. What are the most common test locations, and do they diffe
 
 [**TIP**: Add `theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))` to the end of your plot command to rotate and align the X-axis labels...]
 
-```{r}
+```{r, bar graph of endpoint data}
 ggplot(Neonics.df, aes(x = Endpoint)) +
   geom_bar() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) #rotating and aligning x-axis labels
 ```
 
 > Answer: The two most common endpoints are LOEL and NOEL. According to the Ecotox appendix, LOEL refers to the lowest-observable-effect-level or the lowest dose that produced effects that were signficantly different from the responses resulting from controls. NOEL refers to no-observable-effect-level or the highest dose producing effects not signficantly different from the responses resulting from controls. 
@@ -135,7 +135,7 @@ ggplot(Neonics.df, aes(x = Endpoint)) +
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
-```{r}
+```{r, determining and changing class}
 class(Litter.df$collectDate) #factor
 
 Litter.df$collectDate <- as.Date(Litter.df$collectDate, format = "%Y-%m-%d")
@@ -147,7 +147,7 @@ unique(Litter.df$collectDate) #sampled in August 2018 on the 2nd and 30th
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
-```{r}
+```{r, determining number of plots}
 unique(Litter.df$plotID) #12 different plots
 
 summary(Litter.df$plotID)
@@ -157,19 +157,19 @@ summary(Litter.df$plotID)
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
-```{r}
+```{r, bar graph of functiongroup counts}
 ggplot(Litter.df, aes(x = functionalGroup)) +
   geom_bar()
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
-```{r}
+```{r, comparison of box and violin plots}
 ggplot(Litter.df) +
-  geom_boxplot(aes(x = dryMass, y = functionalGroup))
+  geom_boxplot(aes(x = functionalGroup, y = dryMass))
 
 ggplot(Litter.df) +
-  geom_violin(aes(x = dryMass, y = functionalGroup), 
+  geom_violin(aes(x = functionalGroup, y = dryMass), 
               draw_quantiles = c(0.25, 0.5, 0.75))
 ```
 
@@ -179,4 +179,4 @@ Why is the boxplot a more effective visualization option than the violin plot in
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer: According to the box-and-whisker plot, needles and mixed litter tend to have the highest interquartile range of biomass, followed by twigs and branches. Opposingly, the violin chart shows the overall range of dry mass recorded for each functional group and shows needles and twigs/branches to have the overall highest biomass. 
+> Answer: According to the box-and-whisker plot, needles and mixed litter tend to have the highest interquartile range of biomass, followed by twigs and branches. However, the twigs/branches group has an outlier that is larger than the mixed litter, which shows that needles, twigs and branches have the highest biomass. Opposingly, the violin chart shows the overall range of dry mass recorded for each functional group and shows needles and twigs/branches to have the overall highest biomass. 
