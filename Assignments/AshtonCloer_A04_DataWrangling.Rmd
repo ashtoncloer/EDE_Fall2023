@@ -103,7 +103,14 @@ EPAair_PM25_NC2019.select.df <- select(EPAair_PM25_NC2019.df, Date, DAILY_AQI_VA
 
 #5 manipulating the PM2.5 columns 
 
+levels(EPAair_PM25_NC2018.select.df$AQS_PARAMETER_DESC)
+levels(EPAair_PM25_NC2019.select.df$AQS_PARAMETER_DESC)
 
+EPAair_PM25_NC2018.select.df <- EPAair_PM25_NC2018.select.df %>%
+  mutate(AQS_PARAMETER_DESC = fct_recode(AQS_PARAMETER_DESC, "PM2.5" = "PM2.5 - Local Conditions", "PM2.5" = "Acceptable PM2.5 AQI & Speciation Mass"))
+
+EPAair_PM25_NC2019.select.df <- EPAair_PM25_NC2019.select.df %>%
+  mutate(AQS_PARAMETER_DESC = fct_recode(AQS_PARAMETER_DESC, "PM2.5" = "PM2.5 - Local Conditions", "PM2.5" = "Acceptable PM2.5 AQI & Speciation Mass"))
 
 #6 saving processed datasets
 
@@ -137,22 +144,39 @@ write.csv(EPAair_PM25_NC2019.select.df, row.names = FALSE, file = "./Data/Proces
 
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1819_Processed.csv"
 
-```{r}
+```{r combining and manipulating datasets}
 #7 combining the datasets
 
 EPAair_2018thru2019.df <- rbind(EPAair_03_NC2018.select.df, EPAair_03_NC2019.select.df, EPAair_PM25_NC2018.select.df, EPAair_PM25_NC2019.select.df)
 
 #8 "Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School"
 
-EPAair_2018thru2019.df %>%
-  filter(EPAair_2018thru2019.df, Site.Name != 'Linville Falls' & Site.Name != 'Durham Armory' & Site.Name != 'Leggett')
+intersection_03.df <- intersect(EPAair_03_NC2018.select.df$Site.Name, EPAair_03_NC2019.select.df$Site.Name)
+
+intersection_pm.df <- intersect(EPAair_PM25_NC2018.select.df$Site.Name, EPAair_PM25_NC2019.select.df$Site.Name)
+
+Intersection_all <- intersect(intersection_03.df, intersection_pm.df)
+
+class(EPAair_2018thru2019.df$Site.Name)
+
+EPAair_2018thru2019.df$Site.Name <- as.character(EPAair_2018thru2019.df$Site.Name)
+
+class(EPAair_2018thru2019.df$Site.Name)
+
+EPAair_2018thru2019.processed.df <- EPAair_2018thru2019.df %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
+  group_by(Site.Name, Date, AQS_PARAMETER_DESC, COUNTY) %>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE), meanlat = mean(SITE_LATITUDE), meanlong = mean(SITE_LONGITUDE)) %>%
+  mutate(year = lubridate::year(Date), month = lubridate::month(Date))
 
 #9
+EPAair_2018thru2019.processed.df <- pivot_wider(EPAair_2018thru2019.processed.df, names_from = AQS_PARAMETER_DESC, values_from = meanAQI)
 
 #10
-
+dim(EPAair_2018thru2019.processed.df)
+ 
 #11
-
+write.csv(EPAair_2018thru2019.processed.df, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2019_Processed.csv")
 ```
 
 
@@ -165,13 +189,16 @@ EPAair_2018thru2019.df %>%
 ```{r}
 
 #12
-
+EPAair_2018thru2019.processed.2.df <- EPAair_2018thru2019.processed.df %>%
+  drop_na(Ozone) %>%
+  group_by(Site.Name, month, year) %>%
+  summarise(meanOzone = mean(Ozone), meanPM2.5 = mean(PM2.5))
 
 #13
-
+dim(EPAair_2018thru2019.processed.2.df)
 
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: drop_na is apart of the tidyr package and works best with the pipe as compared to na.omit which works best in a single line of code
