@@ -51,7 +51,7 @@ EPAair_PM25_NC2019.df <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", strin
 
 2. Apply the `glimpse()` function to reveal the dimensions, column names, and structure of each dataset. 
 
-```{r setup, message = FALSE, glimpsing each data set}
+```{r setup, message = FALSE}
 #1a 9737 rows of 20 variables - date, source, site.id, POC, daily max, units, daily AQI value, site name, daily observation count, percent complete, AQS parameter code, AQS parameter descending, CBSA code, CBSA name, State code, state, county code, county, site lat, site long
 glimpse(EPAair_03_NC2018.df)
 
@@ -79,16 +79,16 @@ glimpse(EPAair_PM25_NC2019.df)
 ```{r wrangling individual datasets}
 #3 changing date column to read as date
 
-EPAair_03_NC2018.df$Date <- as.Date(EPAair_03_NC2018.df$Date, format = '%m/%d/%y')
+EPAair_03_NC2018.df$Date <- as.Date(EPAair_03_NC2018.df$Date, format = '%m/%d/%Y')
 class(EPAair_PM25_NC2018.df$Date)
 
-EPAair_03_NC2019.df$Date <- as.Date(EPAair_03_NC2019.df$Date, format = '%m/%d/%y')
+EPAair_03_NC2019.df$Date <- as.Date(EPAair_03_NC2019.df$Date, format = '%m/%d/%Y')
 class(EPAair_03_NC2019.df$Date)
 
-EPAair_PM25_NC2018.df$Date <- as.Date(EPAair_PM25_NC2018.df$Date, format = '%m/%d/%y')
+EPAair_PM25_NC2018.df$Date <- as.Date(EPAair_PM25_NC2018.df$Date, format = '%m/%d/%Y')
 class(EPAair_PM25_NC2018.df$Date)
 
-EPAair_PM25_NC2019.df$Date <- as.Date(EPAair_PM25_NC2019.df$Date, format = '%m/%d/%y')
+EPAair_PM25_NC2019.df$Date <- as.Date(EPAair_PM25_NC2019.df$Date, format = '%m/%d/%Y')
 class(EPAair_PM25_NC2019.df$Date)
 
 #4 selecting columns Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE
@@ -151,23 +151,15 @@ EPAair_2018thru2019.df <- rbind(EPAair_03_NC2018.select.df, EPAair_03_NC2019.sel
 
 #8 "Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School"
 
-intersection_03.df <- intersect(EPAair_03_NC2018.select.df$Site.Name, EPAair_03_NC2019.select.df$Site.Name)
 
-intersection_pm.df <- intersect(EPAair_PM25_NC2018.select.df$Site.Name, EPAair_PM25_NC2019.select.df$Site.Name)
-
-Intersection_all <- intersect(intersection_03.df, intersection_pm.df)
-
-class(EPAair_2018thru2019.df$Site.Name)
-
-EPAair_2018thru2019.df$Site.Name <- as.character(EPAair_2018thru2019.df$Site.Name)
-
-class(EPAair_2018thru2019.df$Site.Name)
 
 EPAair_2018thru2019.processed.df <- EPAair_2018thru2019.df %>%
   filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
-  group_by(Site.Name, Date, AQS_PARAMETER_DESC, COUNTY) %>%
-  summarise(meanAQI = mean(DAILY_AQI_VALUE), meanlat = mean(SITE_LATITUDE), meanlong = mean(SITE_LONGITUDE)) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  dplyr::summarize(meanAQI = mean(DAILY_AQI_VALUE), meanlat = mean(SITE_LATITUDE), meanlong = mean(SITE_LONGITUDE)) %>%
   mutate(year = lubridate::year(Date), month = lubridate::month(Date))
+
+dim(EPAair_2018thru2019.processed.df)
 
 #9
 EPAair_2018thru2019.processed.df <- pivot_wider(EPAair_2018thru2019.processed.df, names_from = AQS_PARAMETER_DESC, values_from = meanAQI)
