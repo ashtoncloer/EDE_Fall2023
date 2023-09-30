@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2: Coding Basics"
-author: "Student Name"
+author: "Ashton Cloer"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -32,10 +32,20 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 
 ```{r basics 1}
 #1. 
+seq(1, 30, 3) #creating sequence of numbers 1-30 by threes
+threes_sequence <- seq(1, 30, 3) #naming sequence
+threes_sequence #calling out the sequence
 
+ 
 #2. 
 
+mean(threes_sequence) #calculating sequence mean
+median(threes_sequence) #calculating sequence median 
+
 #3. 
+
+mean(threes_sequence) > median(threes_sequence) #asking R if mean of sequence is greater than the median
+median(threes_sequence) > mean(threes_sequence) #asking R if median of sequence is greater than mean
 
 ```
 
@@ -50,21 +60,41 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 8.  Label the columns of your data frame with informative titles.
 
 ```{r basics 2}
+student_names <- c("Ashton", "Beth", "Caroline", "Deanna") #character
+student_names
 
+test_scores <- c(100, 80, 75, 40) #numerical 
+test_scores
+
+pass_or_fail <- c(TRUE, TRUE, TRUE, FALSE) #logical 
+
+df_student_test_scores <- as.data.frame(student_names)
+
+df_scores <- as.data.frame(test_scores)
+
+df_logical <- as.data.frame(pass_or_fail)
+
+df_student_test_scores_values <- cbind(df_student_test_scores, df_scores, df_logical)
+
+colnames(df_student_test_scores_values)[1] ="Names"
+colnames(df_student_test_scores_values)[2] ="Score"
+colnames(df_student_test_scores_values)[3] ="Passing"
 ```
 
 9.  QUESTION: How is this data frame different from a matrix?
 
-> Answer:
+> Answer: This data frame combines various types of data such as characters, numeric, and logical data. A matrix can only hold a single data type. 
 
 10. Create a function with an if/else statement. Your function should take a **vector** of test scores and print (not return) whether a given test score is a passing grade of 50 or above (TRUE or FALSE). You will need to choose either the `if` and `else` statements or the `ifelse` statement. 
 
 11. Apply your function to the vector with test scores that you created in number 5.
 
 ```{r basics 3}
+check_passing_grades <- ifelse(test_scores >=50, "Passing", "Failing")
 
+print(check_passing_grades)
 ```
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
 
-> Answer:
+> Answer: Ifelse worked for the function. I believe it is because ifelse works best with the entire string of data in the vector test_scores whereas if and else seemed to only work on individual values in the vector. 
