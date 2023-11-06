@@ -54,66 +54,69 @@ theme_set(mytheme1)
 GaringerNC2010.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2011.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2012.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2013.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2014.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2015.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2016.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2017.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2018.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv"),
     stringsAsFactors = TRUE)
 
 GaringerNC2019.df <- 
   read.csv(
     here(
-    "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv"),
+    "EDE_Fall2023/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv"),
     stringsAsFactors = TRUE)
 
-GaringerOzone.df <- rbind(GaringerNC2019.df, GaringerNC2018.df, GaringerNC2017.df, GaringerNC2016.df, GaringerNC2015.df, GaringerNC2014.df, GaringerNC2013.df, GaringerNC2012.df, GaringerNC2011.df, GaringerNC2010.df)
-
-#do I use inner_join
+GaringerOzone.df <- rbind(
+  GaringerNC2019.df, GaringerNC2018.df, 
+  GaringerNC2017.df, GaringerNC2016.df, 
+  GaringerNC2015.df, GaringerNC2014.df, 
+  GaringerNC2013.df, GaringerNC2012.df, 
+  GaringerNC2011.df, GaringerNC2010.df)
 ```
 
 ## Wrangle
@@ -128,15 +131,22 @@ GaringerOzone.df <- rbind(GaringerNC2019.df, GaringerNC2018.df, GaringerNC2017.d
 
 ```{r}
 # 3
-GaringerOzone.df$Date <- as.Date(GaringerOzone.df$Date, format = '%m/%d/%Y')
+GaringerOzone.df$Date <- as.Date(
+  GaringerOzone.df$Date, format = '%m/%d/%Y')
 # 4
-GaringerOzone_select.df <- select(GaringerOzone.df, Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
+GaringerOzone_select.df <- select(
+  GaringerOzone.df, Date, 
+  Daily.Max.8.hour.Ozone.Concentration, 
+  DAILY_AQI_VALUE)
 # 5
-Day.df <- as.data.frame(seq(as.Date("2010/01/01"), as.Date("2019/12/31"), by = "1 day"))
+Day.df <- as.data.frame(seq(
+  as.Date("2010/01/01"), 
+  as.Date("2019/12/31"), by = "1 day"))
 colnames(Day.df)[1] = "Date"
 
 #6
-GaringerOzone.df <- left_join(Day.df, GaringerOzone_select.df)
+GaringerOzone.df <- left_join(
+  Day.df, GaringerOzone_select.df)
 ```
 
 ## Visualize
@@ -145,10 +155,13 @@ GaringerOzone.df <- left_join(Day.df, GaringerOzone_select.df)
 
 ```{r}
 #7
-ozone_bytime <- ggplot(GaringerOzone.df, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
+ozone_bytime <- ggplot(
+  GaringerOzone.df, aes(x = Date, 
+                        y = Daily.Max.8.hour.Ozone.Concentration)) +
   geom_line() +
   geom_smooth(method = "lm") +
-  labs(x = "Date", y = "Daily Ozone Concentrations") +
+  labs(x = "Date", 
+       y = "Daily Ozone Concentrations (ppm)") +
   mytheme1
 
 print(ozone_bytime)
@@ -166,10 +179,12 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 #8
 GaringerOzone_clean.df <- 
   GaringerOzone.df %>% 
-  mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+  mutate(
+    Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(
+      Daily.Max.8.hour.Ozone.Concentration))
 ```
 
-> Answer: ????
+> Answer: The linear interpolation function connects dots with shortest line possible and does not change characteristics of original dataset. This is the simplest way of replacing NAs without changing the summary stasticis and any other characteristics. Compared to the linear interpolation, the spline function is best used on parameteric function which this data does not contain. And the peicewise constant would more than likely change some characteristics of the data due to its method of assuming NAs are equal to the closest point. 
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
@@ -177,13 +192,19 @@ GaringerOzone_clean.df <-
 ```{r}
 #9
 GaringerOzone_monthly.df <- GaringerOzone_clean.df %>%
-  mutate(year = lubridate::year(Date), month = lubridate::month(Date)) %>%
-  group_by(month, year) %>%
-  summarise(mean.ozone.concentrations = mean(Daily.Max.8.hour.Ozone.Concentration.clean)) #do i use the clean column here
+  mutate(
+    year = lubridate::year(Date), 
+    month = lubridate::month(Date)) %>%
+  group_by(year, month) %>%
+  summarise(
+    mean.ozone.concentrations = mean(
+      Daily.Max.8.hour.Ozone.Concentration.clean)) 
 
 GaringerOzone_monthly_complete.df <- GaringerOzone_monthly.df %>%
-  mutate(Date = my(paste0(month,"-",year))) %>%
-  select(Date, mean.ozone.concentrations) #is this correct? bc the date column doesnt show up in the df
+  mutate(
+    Date = my(paste0(month,"-",year))) %>%
+  select(
+    Date, mean.ozone.concentrations) 
 ```
 
 
@@ -191,15 +212,21 @@ GaringerOzone_monthly_complete.df <- GaringerOzone_monthly.df %>%
 
 ```{r}
 #10
-f_month <- month(first(GaringerOzone_monthly_complete.df$Date))
-f_year <- year(GaringerOzone_monthly_complete.df$Date)
+f_month <- month(
+  first(
+    GaringerOzone_monthly_complete.df$Date))
 
-GaringerOzone.daily.ts <- ts(GaringerOzone_clean.df$Daily.Max.8.hour.Ozone.Concentration.clean,
-                   start=c(f_year,f_month),
-                   frequency=12) #what should the frequency be for the daily ts
+f_year <- year(
+  first(GaringerOzone_monthly_complete.df$Date))
 
+GaringerOzone.daily.ts <- ts(
+  GaringerOzone_clean.df$Daily.Max.8.hour.Ozone.Concentration.clean,
+                   start=c(
+                     f_year,f_month),
+                   frequency=365) 
 
-GaringerOzone.monthly.ts <- ts(GaringerOzone_monthly_complete.df$mean.ozone.concentrations,
+GaringerOzone.monthly.ts <- ts(
+  GaringerOzone_monthly_complete.df$mean.ozone.concentrations,
                    start=c(f_year,f_month),
                    frequency=12)
 ```
@@ -209,10 +236,12 @@ GaringerOzone.monthly.ts <- ts(GaringerOzone_monthly_complete.df$mean.ozone.conc
 
 ```{r}
 #11
-Ozone_daily_decomp <- stl(GaringerOzone.daily.ts,s.window = "periodic")
+Ozone_daily_decomp <- stl(
+  GaringerOzone.daily.ts,s.window = "periodic")
 plot(Ozone_daily_decomp)
 
-Ozone_monthly_decomp <- stl(GaringerOzone.monthly.ts,s.window = "periodic")
+Ozone_monthly_decomp <- stl(
+  GaringerOzone.monthly.ts,s.window = "periodic")
 plot(Ozone_monthly_decomp)
 ```
 
@@ -221,23 +250,29 @@ plot(Ozone_monthly_decomp)
 
 ```{r}
 #12
-trend::smk.test(GaringerOzone.monthly.ts)
+Seasonal_mann <- Kendall::SeasonalMannKendall(
+  GaringerOzone.monthly.ts)
 
-
+print(Seasonal_mann)
 ```
 
-> Answer: ???
+> Answer: Because our data displayed seasonal and/or cyclical trends when we plotted ozone concentrations over time. 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
 # 13
-#do I use the .df or the ts for this graph
-mean_monthly_ozone_bytime <- ggplot(GaringerOzone_monthly_complete.df, aes(x = Date, y = mean.ozone.concentrations)) +
+
+mean_monthly_ozone_bytime <- ggplot(
+  GaringerOzone_monthly_complete.df, aes(
+    x = Date, 
+    y = mean.ozone.concentrations)) +
   geom_point() +
   geom_line() +
   geom_smooth(method = "lm") +
-  labs(x = "Date", y = "Monthly Mean Ozone Concentrations") +
+  labs(
+    x = "Date", 
+    y = "Monthly Mean Ozone Concentrations") +
   mytheme1
 
 print(mean_monthly_ozone_bytime)
@@ -245,7 +280,7 @@ print(mean_monthly_ozone_bytime)
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: ???
+> Answer: At this station, Ozone concentrations do display a monotonic trend (p=0.046724), suggesting the trend does change, perhaps decrease (suggested by the negative tau = -0.143), throughout time, which is also suggested by the graph. The data does exhibit an seasonal and/or cyclical nature, suggesting the trend in ozone concentrations did change at this station. 
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -253,18 +288,17 @@ print(mean_monthly_ozone_bytime)
 
 ```{r}
 #15
-GaringerOzone_monthly_Components <- as.data.frame(Ozone_monthly_decomp$time.series[,1:3])
+GaringerOzone_monthly_Components.ts <- as.data.frame(
+  Ozone_monthly_decomp$time.series[,1:3])
 
-GaringerOzone_monthly_Components <- mutate(GaringerOzone_monthly_Components,
-        Observed = GaringerOzone_monthly_complete.df$mean.ozone.concentrations,     
+GaringerOzone_monthly_Components.ts <- mutate(
+  GaringerOzone_monthly_Components.ts, Observed = GaringerOzone_monthly_complete.df$mean.ozone.concentrations,     
         Date = GaringerOzone_monthly_complete.df$Date)
 
 
 #16
 
-trend::smk.test(GaringerOzone_monthly_Components) #?????
-
-
+Kendall::MannKendall(GaringerOzone_monthly_Components.ts$Observed)
 ```
 
-> Answer: ???
+> Answer: The test on the non-seasonal Ozone monthly series suggests that there is not a monotonic trend, suggesting the ozone concentrations does not increase or decrease across time (p=0.33732). Compared to the previous test which suggested that the ozone concentrations did change over time. 
